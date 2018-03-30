@@ -12,4 +12,7 @@
 hs_err_pid*
 
 .idea
+.classpath
+.project
+.settings/org.eclipse.jdt.core.prefs
 fitbitAPI20-scribe-java.iml
