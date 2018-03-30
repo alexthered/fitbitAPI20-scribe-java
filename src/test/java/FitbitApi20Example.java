@@ -15,21 +15,25 @@ public class FitbitApi20Example {
 
     private static final String NETWORK_NAME = "Fitbit";
 
+    // Replace these with your client id and secret fron your app
+    private static final String CLIENT_ID = "22CV6P";
+    private static final String CLIENT_SECRET = "04fba2a406cbd5bb4b5db0242782de08";
+    
+    // Replace with user ID to test API against
+    private static final String USER_ID = "3BZ2KZ";
+    
     //this url is used to get user's profile
-    private static final String PROTECTED_RESOURCE_URL = "https://api.fitbit.com/1/user/-/profile.json";
+    private static final String PROTECTED_RESOURCE_URL = "https://api.fitbit.com/1/user/" + USER_ID + "/profile.json";
 
     private FitbitApi20Example() {
     }
 
-    public static void main(String... args) throws IOException {
-        // Replace these with your client id and secret
-        final String clientId = "your client id";
-        final String clientSecret = "your client secret";
+    public static void main(String... args) throws Exception {
 
-        final OAuth20Service service = new ServiceBuilder()
-                .apiKey(clientId)
-                .apiSecret(clientSecret)
-                .scope("activity%20profile") // replace with desired scope
+
+        final OAuth20Service service = new ServiceBuilder(CLIENT_ID)
+                .apiSecret(CLIENT_SECRET)
+                .scope("activity profile") // replace with desired scope
                 .callback("http://example.com")  //your callback URL to store and handle the authorization code sent by Fitbit
                 .state("some_params")
                 .build(FitbitApi20.instance());
@@ -61,13 +65,13 @@ public class FitbitApi20Example {
         // This will get the profile for this user
         System.out.println("Now we're going to access a protected resource...");
 
-        final OAuthRequest request = new OAuthRequest(Verb.GET, PROTECTED_RESOURCE_URL, service);
+        final OAuthRequest request = new OAuthRequest(Verb.GET, PROTECTED_RESOURCE_URL);
         request.addHeader("x-li-format", "json");
 
         //add header for authentication (why make it so complicated, Fitbit?)
         request.addHeader("Authorization", "Bearer " + accessToken.getAccessToken());
 
-        final Response response = request.send();
+        final Response response = service.execute(request);
         System.out.println();
         System.out.println(response.getCode());
         System.out.println(response.getBody());

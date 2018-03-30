@@ -1,8 +1,9 @@
 import com.github.scribejava.core.builder.api.DefaultApi20;
-import com.github.scribejava.core.model.AbstractRequest;
+import com.github.scribejava.core.java8.Base64;
 import com.github.scribejava.core.model.OAuthConfig;
+import com.github.scribejava.core.model.OAuthConstants;
+import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.oauth.OAuth20Service;
-import com.github.scribejava.core.services.Base64Encoder;
 
 import java.nio.charset.Charset;
 
@@ -23,24 +24,26 @@ public class Fitbit20ServiceImpl extends OAuth20Service {
      * @return
      */
     @Override
-    protected <T extends AbstractRequest> T createAccessTokenRequest(String code, T request) {
-        OAuthConfig config = this.getConfig();
-        request.addParameter("client_id", config.getApiKey());
-        request.addParameter("client_secret", config.getApiSecret());
-        request.addParameter("code", code);
-        request.addParameter("redirect_uri", config.getCallback());
+    protected OAuthRequest createAccessTokenRequest(String code)
+    {
+        final DefaultApi20 api = getApi();
+        final OAuthRequest request = new OAuthRequest(api.getAccessTokenVerb(), api.getAccessTokenEndpoint());
+        final OAuthConfig config = getConfig();
+        request.addParameter(OAuthConstants.CLIENT_ID, config.getApiKey());
+        request.addParameter(OAuthConstants.CLIENT_SECRET, config.getApiSecret());
+        request.addParameter(OAuthConstants.CODE, code);
+        request.addParameter(OAuthConstants.REDIRECT_URI, config.getCallback());
         String scope = config.getScope();
-        if(scope != null) {
-            request.addParameter("scope", scope);
+        if (scope != null) {
+            request.addParameter(OAuthConstants.SCOPE, scope);
         }
+        
+		//this is non-OAuth2 standard, but Fitbit requires it
+		request.addHeader("Authorization", "Basic " + getKeyBytesForFitbitAuth());
 
-        //this is non-OAuth2 standard, but Fitbit requires it
-        request.addHeader("Authorization", "Basic " + Base64Encoder.getInstance().encode(String.format("%s:%s", new Object[]{config.getApiKey(), config.getApiSecret()}).getBytes(Charset.forName("UTF-8"))));
-
-        request.addParameter("grant_type", "authorization_code");
+        request.addParameter(OAuthConstants.GRANT_TYPE, OAuthConstants.AUTHORIZATION_CODE);
         return request;
     }
-
 
     /**
      * ref: https://dev.fitbit.com/docs/oauth2/#refreshing-tokens
@@ -50,21 +53,35 @@ public class Fitbit20ServiceImpl extends OAuth20Service {
      * @return
      */
     @Override
-    protected <T extends AbstractRequest> T createRefreshTokenRequest(String refreshToken, T request) {
-        if(refreshToken != null && !refreshToken.isEmpty()) {
-            OAuthConfig config = this.getConfig();
-            request.addParameter("client_id", config.getApiKey());
-            request.addParameter("client_secret", config.getApiSecret());
-            request.addParameter("refresh_token", refreshToken);
-            request.addParameter("grant_type", "refresh_token");
+    protected OAuthRequest createRefreshTokenRequest(String refreshToken)
+    {
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+        		final DefaultApi20 api = getApi();
+        		final OAuthRequest request = new OAuthRequest(api.getAccessTokenVerb(), api.getAccessTokenEndpoint());
+        		final OAuthConfig config = this.getConfig();
+        		request.addParameter(OAuthConstants.CLIENT_ID, config.getApiKey());
+        		request.addParameter(OAuthConstants.CLIENT_SECRET, config.getApiSecret());
+        		request.addParameter(OAuthConstants.REFRESH_TOKEN, refreshToken);
+        		request.addParameter(OAuthConstants.GRANT_TYPE, OAuthConstants.REFRESH_TOKEN);
 
-            //this is non-OAuth2 standard, but Fitbit requires it
-            request.addHeader("Authorization", "Basic " + Base64Encoder.getInstance().encode(String.format("%s:%s", new Object[]{config.getApiKey(), config.getApiSecret()}).getBytes(Charset.forName("UTF-8"))));
+        		//this is non-OAuth2 standard, but Fitbit requires it
+        		request.addHeader("Authorization", "Basic " + getKeyBytesForFitbitAuth());
 
             return request;
         } else {
             throw new IllegalArgumentException("The refreshToken cannot be null or empty");
         }
     }
+
+    /**
+     */
+    	private String getKeyBytesForFitbitAuth()
+    	{
+    		final OAuthConfig config = getConfig();
+    		String keyAndSecret = String.format("%s:%s", new Object[] {config.getApiKey(), config.getApiSecret()});
+        byte[] keyBytes = Base64.getEncoder().encode(keyAndSecret.getBytes(Charset.forName("UTF-8")));
+        
+        return new String(keyBytes);
+    	}
 
 }
