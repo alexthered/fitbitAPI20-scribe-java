@@ -11,10 +11,9 @@ This is my FitbitAPI20 client's implmentation basing on scribe-java library. To 
 It's very to use. Just include two files `FitbitApi20.java` and `Fitbit20ServiceImpl` in your projects. Then you can easily setup the Fitbit client like this:
 
 ```java
-final OAuth20Service service = new ServiceBuilder()
-                .apiKey(clientId)
+final OAuth20Service service = new ServiceBuilder(clientId)
                 .apiSecret(clientSecret)
-                .scope("activity%20profile") // replace with desired scope
+                .scope("activity profile") // replace with desired scope
                 .callback("http://example.com")  //your callback URL to store and handle the authorization code sent by Fitbit
                 .build(FitbitApi20.instance());
 ```
@@ -25,7 +24,7 @@ Of course, you need to include scribe-java as a library. It's very easy if you u
  <dependency>
           <groupId>com.github.scribejava</groupId>
           <artifactId>scribejava-core</artifactId>
-          <version>3.2.0</version>
+          <version>5.3.0</version>
   </dependency>
 ```
 
