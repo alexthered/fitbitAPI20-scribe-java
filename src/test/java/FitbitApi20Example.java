@@ -30,7 +30,6 @@ public class FitbitApi20Example {
 
     public static void main(String... args) throws Exception {
 
-
         final OAuth20Service service = new ServiceBuilder(CLIENT_ID)
                 .apiSecret(CLIENT_SECRET)
                 .scope("activity profile") // replace with desired scope
