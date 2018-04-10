@@ -16,11 +16,11 @@ public class FitbitApi20Example {
     private static final String NETWORK_NAME = "Fitbit";
 
     // Replace these with your client id and secret fron your app
-    private static final String CLIENT_ID = "22CV6P";
-    private static final String CLIENT_SECRET = "04fba2a406cbd5bb4b5db0242782de08";
+    private static final String CLIENT_ID = "your client id";
+    private static final String CLIENT_SECRET = "your client secret";
     
     // Replace with user ID to test API against
-    private static final String USER_ID = "3BZ2KZ";
+    private static final String USER_ID = "your user id";
     
     //this url is used to get user's profile
     private static final String PROTECTED_RESOURCE_URL = "https://api.fitbit.com/1/user/" + USER_ID + "/profile.json";
