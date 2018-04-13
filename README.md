@@ -1,4 +1,7 @@
 # fitbitAPI20-scribe-java
+
+## Note: this work now is included in scribe-java's api library
+
 Fitbit's OAuth2.0 basing on scribe-java library
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.scribejava/scribejava/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.scribejava/scribejava)
